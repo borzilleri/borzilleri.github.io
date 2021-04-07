@@ -1,0 +1,203 @@
+<html>
+
+<head>
+  <style type="text/css">
+    label {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="input">
+    <label>
+      <input type="text" data-input="furs" placeholder="0" size="10"> Fur Production per Second.
+    </label>
+    <label>
+      <input type="text" data-input="steamworks" placeholder="0" size="10"> Steamworks
+    </label>
+    <label>
+      <input type="text" data-input="craft-output" placeholder="0" size="10"> Craft Bonus
+    </label>
+
+    <label>
+      <input type="text" data-input="parchment" class="craft-time" placeholder="0" size="10"> Parchment Craft Time
+    </label>
+    <label>
+      <input type="text" data-input="manuscript" class="craft-time" placeholder="0" size="10"> Manuscript Craft Time
+    </label>
+    <label>
+      <input type="text" data-input="compendium" class="craft-time" placeholder="0" size="10"> Compendium Craft Time
+    </label>
+    <label>
+      <input type="text" data-input="blueprint" class="craft-time" placeholder="0" size="10"> Blueprint Craft Time
+    </label>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Consumption</th>
+        <th>Production</th>
+        <th></th>
+      </tr>
+    <tbody>
+      <tr data-item="furs">
+        <td>Furs</td>
+        <td data-field="consumption"><span class="value"></span>/s</td>
+        <td data-field="production"><span class="value"></span>/s</td>
+        <td data-field="status"></td>
+      </tr>
+      <tr data-item="parchment">
+        <td>Parchment</td>
+        <td data-field="consumption"><span class="value"></span>/s</td>
+        <td data-field="production"><span class="value"></span>/s</td>
+        <td data-field="status"></td>
+      </tr>
+      <tr data-item="manuscript">
+        <td>Manuscript</td>
+        <td data-field="consumption"><span class="value"></span>/s</td>
+        <td data-field="production"><span class="value"></span>/s</td>
+        <td data-field="status"></td>
+      </tr>
+      <tr data-item="compendium">
+        <td>Compendium</td>
+        <td data-field="consumption"><span class="value"></span>/s</td>
+        <td data-field="production"><span class="value"></span>/s</td>
+        <td data-field="status"></td>
+      </tr>
+    </tbody>
+    </thead>
+  </table>
+
+  <script type="text/javascript">
+    function getInputVal(input) {
+      return parseFloat(document.querySelector(`input[data-input=${input}`).value) || 0;
+    }
+
+    function craftProductionRate(item) {
+      let craft_output = (getInputVal('craft-output') / 100) + 1;
+      let craft_time = getInputVal(item);
+      if (craft_time) {
+        return craft_output / craft_time;
+      }
+      return 0;
+    }
+    function calcConsumptionRate(crafted_item, qty) {
+      let craft_time = getInputVal(crafted_item);
+      if(craft_time) {
+        return qty / craft_time;
+      }
+      return 0;
+    }
+
+    const KV_SEPARATOR = ';';
+    const STEAMWORKS_RATE = 0.01;
+    const DATA = {
+      'furs': {
+        name: 'furs',
+        consumedBy: 'parchment',
+        consumeQty: 175,
+        getProductionRate: function() {
+          return getInputVal('furs');
+        },
+        getConsumptionRate: function() {
+          return calcConsumptionRate(this.consumedBy, this.consumeQty);
+        }
+      },
+      'parchment': {
+        name: 'parchment',
+        consumedBy: 'manuscript',
+        consumeQty: 25,
+        getProductionRate: function() {
+          return craftProductionRate(this.name);
+        },
+        getConsumptionRate: function() {
+          return calcConsumptionRate(this.consumedBy, this.consumeQty);
+        }
+      },
+      'manuscript': {
+        name: 'manuscript',
+        consumedBy: 'compendium',
+        consumeQty: 50,
+        getProductionRate: function() {
+          let craft_rate = craftProductionRate(this.name);
+          let steamworks_qty = getInputVal('steamworks');
+          return (steamworks_qty * STEAMWORKS_RATE) +craft_rate;
+        },
+        getConsumptionRate: function() {
+          return calcConsumptionRate(this.consumedBy, this.consumeQty);
+        }
+      },
+      'compendium': {
+        name: 'compendium',
+        consumedBy: 'blueprint',
+        consumeQty: 25,
+        getProductionRate: function() {
+          return craftProductionRate(this.name);
+        },
+        getConsumptionRate: function() {
+          return calcConsumptionRate(this.consumedBy, this.consumeQty);
+        }
+      }
+    }
+
+
+    function setData(item, field, value) {
+      let v = Math.round((value + Number.EPSILON) * 10000) / 10000
+      document.querySelector(`tr[data-item=${item}] td[data-field=${field}] .value`).textContent = v;
+    }
+
+    function setStatus(item) {
+      let c = parseFloat(document.querySelector(`tr[data-item=${item}] td[data-field=consumption] .value`).textContent) || 0;
+      let p = parseFloat(document.querySelector(`tr[data-item=${item}] td[data-field=production] .value`).textContent) || 0;
+      if( p > c ) {
+        document.querySelector(`tr[data-item=${item}] td[data-field=status]`).textContent = "+";
+      }
+      else {
+        document.querySelector(`tr[data-item=${item}] td[data-field=status]`).textContent = "-";
+      }
+
+    }
+    function recalculate() {
+      for( const [name,item] of Object.entries(DATA) ) {
+        setData(item.name, 'production', item.getProductionRate());
+        setData(item.name, 'consumption', item.getConsumptionRate());
+        setStatus(item.name);        
+      }
+    }
+
+    function loadInputData() {
+      window.location.hash.substr(1)
+        .split(KV_SEPARATOR)
+        .filter(v => v.indexOf('=') > 0)
+        .forEach(kv => {
+          let [key,value] = kv.split('=');
+          let el = document.querySelector(`input[data-input=${key}]`)
+          if( el ) {
+            el.value = value;
+          }
+        });
+    }
+    function saveInputData() {
+      return '#'+Array.from(document.querySelectorAll('input'))
+        .map(el => `${el.dataset.input}=${el.value}`)
+        .join(KV_SEPARATOR);
+    }
+
+
+
+
+
+
+    loadInputData();
+    recalculate();
+    document.querySelector('#input').addEventListener('change', (event) => {
+      window.location.hash = saveInputData();
+      recalculate();
+    });
+  </script>
+</body>
+
+</html>
