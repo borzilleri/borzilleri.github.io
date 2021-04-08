@@ -80,7 +80,7 @@
     }
 
     function craftProductionRate(item) {
-      let craft_output = (getInputVal('craft-output') / 100) + 1;
+      let craft_output = (getInputVal('craft-output') / 100);
       let craft_time = getInputVal(item);
       if (craft_time) {
         return craft_output / craft_time;
@@ -167,7 +167,7 @@
       for( const [name,item] of Object.entries(DATA) ) {
         setData(item.name, 'production', item.getProductionRate());
         setData(item.name, 'consumption', item.getConsumptionRate());
-        setStatus(item.name);        
+        setStatus(item.name);
       }
     }
 
