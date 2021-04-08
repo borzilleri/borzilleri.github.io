@@ -5,24 +5,35 @@
     label {
       display: block;
     }
+
+    .surfeit {
+      color: green;
+    }
+
+    .deficit {
+      color: red;
+    }
   </style>
 </head>
 
 <body>
-  <div id="input">
+
+  <div class="input">
     <label>
       <input type="text" data-input="furs" placeholder="0" size="10"> Fur Production per Second
     </label>
     <label>
-      <input type="text" data-input="steamworks" placeholder="0" size="10"> Steamworks
+      <input type="text" data-input="steamworks" class="building" placeholder="0" size="10"> Steamworks
     </label>
     <label>
       <input type="text" data-input="steamworks-rate" value="0.04" size="10"> Steamworks Rate
     </label>
+  </div>
+
+  <div class="input">
     <label>
       <input type="text" data-input="craft-output" placeholder="0" size="10"> Craft Bonus
     </label>
-
     <label>
       <input type="text" data-input="parchment" class="craft-time" placeholder="0" size="10"> Parchment Craft Time
     </label>
@@ -89,7 +100,7 @@
     }
     function calcConsumptionRate(crafted_item, qty) {
       let craft_time = getInputVal(crafted_item);
-      if(craft_time) {
+      if (craft_time) {
         return qty / craft_time;
       }
       return 0;
@@ -101,10 +112,10 @@
         name: 'furs',
         consumedBy: 'parchment',
         consumeQty: 175,
-        getProductionRate: function() {
+        getProductionRate: function () {
           return getInputVal('furs');
         },
-        getConsumptionRate: function() {
+        getConsumptionRate: function () {
           return calcConsumptionRate(this.consumedBy, this.consumeQty);
         }
       },
@@ -112,10 +123,10 @@
         name: 'parchment',
         consumedBy: 'manuscript',
         consumeQty: 25,
-        getProductionRate: function() {
+        getProductionRate: function () {
           return craftProductionRate(this.name);
         },
-        getConsumptionRate: function() {
+        getConsumptionRate: function () {
           return calcConsumptionRate(this.consumedBy, this.consumeQty);
         }
       },
@@ -123,13 +134,13 @@
         name: 'manuscript',
         consumedBy: 'compendium',
         consumeQty: 50,
-        getProductionRate: function() {
+        getProductionRate: function () {
           let craft_rate = craftProductionRate(this.name);
           let steamworks_qty = getInputVal('steamworks');
           let steamworks_rate = getInputVal('steamworks-rate');
-          return (steamworks_qty * steamworks_rate) +craft_rate;
+          return (steamworks_qty * steamworks_rate) + craft_rate;
         },
-        getConsumptionRate: function() {
+        getConsumptionRate: function () {
           return calcConsumptionRate(this.consumedBy, this.consumeQty);
         }
       },
@@ -137,10 +148,10 @@
         name: 'compendium',
         consumedBy: 'blueprint',
         consumeQty: 25,
-        getProductionRate: function() {
+        getProductionRate: function () {
           return craftProductionRate(this.name);
         },
-        getConsumptionRate: function() {
+        getConsumptionRate: function () {
           return calcConsumptionRate(this.consumedBy, this.consumeQty);
         }
       }
@@ -148,23 +159,22 @@
 
 
     function setData(item, field, value) {
-      let v = Math.round((value + Number.EPSILON) * 10000) / 10000
+      let v = Math.round((value + Number.EPSILON) * 10000) / 10000;
       document.querySelector(`tr[data-item=${item}] td[data-field=${field}] .value`).textContent = v;
     }
 
     function setStatus(item) {
       let c = parseFloat(document.querySelector(`tr[data-item=${item}] td[data-field=consumption] .value`).textContent) || 0;
       let p = parseFloat(document.querySelector(`tr[data-item=${item}] td[data-field=production] .value`).textContent) || 0;
-      if( p > c ) {
-        document.querySelector(`tr[data-item=${item}] td[data-field=status]`).textContent = "+";
-      }
-      else {
-        document.querySelector(`tr[data-item=${item}] td[data-field=status]`).textContent = "-";
-      }
+      let diff = Math.round(((p - c) + Number.EPSILON) * 10000) / 10000
+      let diffSign = diff > 0 ? '+' : '';
+      let el = document.querySelector(`tr[data-item=${item}] td[data-field=status]`);
 
+      el.textContent = `${diffSign}${diff}/s`;
+      el.classList = diffSign == '+' ? "surfeit" : "deficit";
     }
     function recalculate() {
-      for( const [name,item] of Object.entries(DATA) ) {
+      for (const [name, item] of Object.entries(DATA)) {
         setData(item.name, 'production', item.getProductionRate());
         setData(item.name, 'consumption', item.getConsumptionRate());
         setStatus(item.name);
@@ -176,15 +186,15 @@
         .split(KV_SEPARATOR)
         .filter(v => v.indexOf('=') > 0)
         .forEach(kv => {
-          let [key,value] = kv.split('=');
+          let [key, value] = kv.split('=');
           let el = document.querySelector(`input[data-input=${key}]`)
-          if( el ) {
+          if (el) {
             el.value = value;
           }
         });
     }
     function saveInputData() {
-      return '#'+Array.from(document.querySelectorAll('input'))
+      return '#' + Array.from(document.querySelectorAll('input'))
         .map(el => `${el.dataset.input}=${el.value}`)
         .join(KV_SEPARATOR);
     }
