@@ -206,7 +206,7 @@
 
     loadInputData();
     recalculate();
-    document.querySelector('#input').addEventListener('change', (event) => {
+    document.querySelector('input').addEventListener('change', (event) => {
       window.location.hash = saveInputData();
       recalculate();
     });
