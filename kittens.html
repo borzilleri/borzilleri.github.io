@@ -17,36 +17,38 @@
 </head>
 
 <body>
+  <div id="input-fields">
+    <div>
+      <label>
+        <input type="text" data-input="furs" placeholder="0" size="10"> Fur Production per Second
+      </label>
+      <label>
+        <input type="text" data-input="steamworks" class="building" placeholder="0" size="10"> Steamworks
+      </label>
+      <label>
+        <input type="text" data-input="steamworks-rate" value="0.04" size="10"> Steamworks Rate
+      </label>
+    </div>
 
-  <div class="input">
-    <label>
-      <input type="text" data-input="furs" placeholder="0" size="10"> Fur Production per Second
-    </label>
-    <label>
-      <input type="text" data-input="steamworks" class="building" placeholder="0" size="10"> Steamworks
-    </label>
-    <label>
-      <input type="text" data-input="steamworks-rate" value="0.04" size="10"> Steamworks Rate
-    </label>
+    <div>
+      <label>
+        <input type="text" data-input="craft-output" placeholder="0" size="10"> Craft Bonus
+      </label>
+      <label>
+        <input type="text" data-input="parchment" class="craft-time" placeholder="0" size="10"> Parchment Craft Time
+      </label>
+      <label>
+        <input type="text" data-input="manuscript" class="craft-time" placeholder="0" size="10"> Manuscript Craft Time
+      </label>
+      <label>
+        <input type="text" data-input="compendium" class="craft-time" placeholder="0" size="10"> Compendium Craft Time
+      </label>
+      <label>
+        <input type="text" data-input="blueprint" class="craft-time" placeholder="0" size="10"> Blueprint Craft Time
+      </label>
+    </div>
   </div>
 
-  <div class="input">
-    <label>
-      <input type="text" data-input="craft-output" placeholder="0" size="10"> Craft Bonus
-    </label>
-    <label>
-      <input type="text" data-input="parchment" class="craft-time" placeholder="0" size="10"> Parchment Craft Time
-    </label>
-    <label>
-      <input type="text" data-input="manuscript" class="craft-time" placeholder="0" size="10"> Manuscript Craft Time
-    </label>
-    <label>
-      <input type="text" data-input="compendium" class="craft-time" placeholder="0" size="10"> Compendium Craft Time
-    </label>
-    <label>
-      <input type="text" data-input="blueprint" class="craft-time" placeholder="0" size="10"> Blueprint Craft Time
-    </label>
-  </div>
 
   <table>
     <thead>
@@ -200,13 +202,9 @@
     }
 
 
-
-
-
-
     loadInputData();
     recalculate();
-    document.querySelector('input').addEventListener('change', (event) => {
+    document.querySelector('#input-fields').addEventListener('change', (event) => {
       window.location.hash = saveInputData();
       recalculate();
     });
