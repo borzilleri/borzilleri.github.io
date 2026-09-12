@@ -1,0 +1,24 @@
+/* All colours live here. Edit this file to re-theme the site. */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111827;
+  --muted: #6b7280;
+
+  /* Default pill colours, used by any link type without a rule below. */
+  --link-bg: #7e22ce;
+  --link-fg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f2937;
+    --fg: #ffffff;
+    --muted: #9ca3af;
+  }
+}
+
+/* Per-type brand colours. Add a rule here when you add a new link type. */
+.link-github { --link-bg: #333333; }
+.link-mastodon { --link-bg: #6364ff; }
+.link-bsky { --link-bg: #146cfe; }

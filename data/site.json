@@ -1,0 +1,11 @@
+{
+  "title": "Rampant I/O",
+  "name": "Jonathan Borzilleri",
+  "footer": "© 2026 Jonathan Borzilleri",
+  "links": [
+    { "type": "email", "label": "Email", "url": "mailto:jonathan@borzilleri.net" },
+    { "type": "github", "label": "GitHub", "url": "https://github.com/borzilleri" },
+    { "type": "mastodon", "label": "Mastodon", "url": "https://mastodon.sdf.org/@jmb" },
+    { "type": "bsky", "label": "Bluesky", "url": "https://bsky.borzilleri.net" }
+  ]
+}
